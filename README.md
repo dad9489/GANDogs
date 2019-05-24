@@ -1,0 +1,1 @@
+Training images sourced from the [Stanford Dogs Dataset](http://vision.stanford.edu/aditya86/ImageNetDogs/)
