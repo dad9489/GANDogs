@@ -1,6 +1,5 @@
 from __future__ import print_function, division
 
-from keras.datasets import mnist
 from keras.preprocessing.image import ImageDataGenerator
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
@@ -8,9 +7,6 @@ from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
-from keras.models import load_model
-from tensorflow.python.keras import backend as K
-import tensorflow as tf
 
 import os
 import matplotlib.pyplot as plt
@@ -64,16 +60,6 @@ class GAN:
         # Trains the generator to fool the discriminator
         self.combined = Model(z, validity)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
-        # else:
-        # if model_weights_paths is not None:
-        #     self.generator.load_weights(model_weights_paths[0])
-        #     self.discriminator.load_weights(model_weights_paths[1])
-        #     self.combined.load_weights(model_weights_paths[2])
-
-        # with open(model_path+'models.json', 'w+') as f:
-        #     f.write(self.generator.to_json() + '\n')
-        #     f.write(self.discriminator.to_json() + '\n')
-        #     f.write(self.combined.to_json() + '\n')
 
     def build_generator(self):
 
@@ -119,14 +105,12 @@ class GAN:
               model_weights_paths=None):
 
         # Load the dataset
-        #(X_train, _), (_, _) = mnist.load_data()
         path = 'Images/cropped'
         data = ImageDataGenerator().flow_from_directory(path, target_size=(150, 150), batch_size=data_size)
         X_train = next(data)[0]
 
         # Rescale -1 to 1
         X_train = X_train / 127.5 - 1.
-        # X_train = np.expand_dims(X_train, axis=3)
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -176,8 +160,6 @@ class GAN:
                 self.generator.load_weights(model_weights_paths[0])
                 self.discriminator.load_weights(model_weights_paths[1])
                 self.combined.load_weights(model_weights_paths[2])
-                # if epoch % sample_interval == 0:
-                #     self.sample_images(epoch)
                 initialized = True
 
     def sample_images(self, epoch):
@@ -207,29 +189,12 @@ class GAN:
                     os.remove(model_path + "optimizer_%d.pkl" % prev)
                 except FileNotFoundError:
                     pass
-                # os.remove(model_path + "generator_%d.dat" % prev)
-                # os.remove(model_path + "discriminator_%d.dat" % prev)
-                # os.remove(model_path + "combined_%d.dat" % prev)
 
             self.generator.save_weights(model_path + "generator_%d.h5" % epoch)
             self.discriminator.save_weights(model_path + "discriminator_%d.h5" % epoch)
             self.combined.save_weights(model_path + "combined_%d.h5" % epoch)
-            # symbolic_weights_gen = getattr(self.generator.optimizer, 'weights')
-            # symbolic_weights_dis = getattr(self.discriminator.optimizer, 'weights')
-            # symbolic_weights_com = getattr(self.combined.optimizer, 'weights')
-            # weight_values_gen = K.batch_get_value(symbolic_weights_gen)
-            # weight_values_dis = K.batch_get_value(symbolic_weights_dis)
-            # weight_values_com = K.batch_get_value(symbolic_weights_com)
-            # with open('optimizer_gen.pkl', 'wb') as f:
-            #     pickle.dump(weight_values_gen, f)
             with open(model_path+"optimizer_%d.pkl" % epoch, 'wb') as f:
                 pickle.dump(self.discriminator.optimizer.get_weights(), f)
-            # with open('optimizer_com.pkl', 'wb') as f:
-            #     pickle.dump(weight_values_com, f)
-
-            # self.generator.save(model_path+"generator_%d.h5" % epoch)
-            # self.discriminator.save(model_path + "discriminator_%d.h5" % epoch)
-            # self.combined.save(model_path + "combined_%d.h5" % epoch)
 
         plt.close()
 
@@ -246,7 +211,6 @@ if __name__ == '__main__':
         generator_path = model_path+'generator_'+str(load_epoch_num)+exten
         optimizer_path = model_path+'optimizer_'+str(load_epoch_num)+'.pkl'
         gan = GAN()
-        # epochs=30000
         gan.train(epochs=1000000, batch_size=32, sample_interval=50, starting_num=load_epoch_num,
                   model_weights_paths=(generator_path, discriminator_path, combined_path))
     else:
