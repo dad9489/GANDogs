@@ -15,9 +15,10 @@ def load_model():
 
 def sample_images():
     gen_imgs = model.predict(noise)
-
+    # gen_imgs.astype(float)
     # Rescale images 0 - 1
     gen_imgs = 0.5 * gen_imgs + 0.5
+    gen_imgs = np.round(gen_imgs, 5)
 
     fig, axs = plt.subplots(r, c, figsize=(15, 15))
     cnt = 0
