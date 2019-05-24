@@ -107,10 +107,10 @@ class GAN:
         # Load the dataset
         path = 'Images/cropped'
         data = ImageDataGenerator().flow_from_directory(path, target_size=(150, 150), batch_size=data_size)
-        X_train = next(data)[0]
+        x_train = next(data)[0]
 
         # Rescale -1 to 1
-        X_train = X_train / 127.5 - 1.
+        x_train = x_train / 127.5 - 1.
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -125,8 +125,8 @@ class GAN:
             # ---------------------
 
             # Select a random batch of images
-            idx = np.random.randint(0, X_train.shape[0], batch_size)
-            imgs = X_train[idx]
+            idx = np.random.randint(0, x_train.shape[0], batch_size)
+            imgs = x_train[idx]
 
             noise = np.random.normal(0, 1, (batch_size, self.latent_dim))
 

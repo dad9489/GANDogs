@@ -1,6 +1,7 @@
 from keras.models import model_from_json
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 
 def load_model():
@@ -29,9 +30,18 @@ def sample_images():
     plt.close()
 
 
+def get_epoch(path):
+    num = -1
+    for filename in os.listdir(path):
+        if filename[-3:] == '.h5':
+            num = int(filename[-8:-3])
+            break
+    return num
+
+
 if __name__ == '__main__':
     model_path = 'images/dog_gen/models/'
-    epoch = 59400
+    epoch = get_epoch(model_path)
     r, c = 5, 5
     latent_dim = 100
     noise = np.random.normal(0, 1, (r * c, latent_dim))
